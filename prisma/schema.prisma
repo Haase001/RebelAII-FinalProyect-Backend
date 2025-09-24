@@ -15,4 +15,23 @@ model User {
   lastName  String?
   birthDate DateTime?
   createdAt DateTime @default(now())
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  title     String?
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  messages  Message[]
+  createdAt DateTime  @default(now())
+}
+
+model Message {
+  id             Int       @id @default(autoincrement())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  sender         String    // "user" o "ai"
+  content        String
+  createdAt      DateTime  @default(now())
 }
