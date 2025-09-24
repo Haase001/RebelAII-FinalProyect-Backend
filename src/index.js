@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import prisma from '../prisma/client.js';
 import { router as authRoutes } from './routes/auth.js';
+import conversationRoutes from './routes/conversations.js';
 
 
 dotenv.config();
@@ -11,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+app.use('/api', conversationRoutes);
 
 // Ruta de prueba para verificar conexión con la base de datos
 app.get('/api/users', async (req, res) => {
