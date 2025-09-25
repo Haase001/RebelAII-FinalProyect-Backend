@@ -8,6 +8,25 @@ import { verifyToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'clave_super_secreta';
 
+//Ruta para verificar si un usuario está registrado
+router.post('/check-email', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (user) {
+            return res.json({ exists: true });
+        } else {
+            return res.json({ exists: false });
+        }
+    } catch (error) {
+        console.error('Error en /check-email:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+
 // Ruta para registrar usuarios
 router.post('/signup', async (req, res) => {
     const { email, password, firstName, lastName, birthDate } = req.body;
@@ -33,9 +52,15 @@ router.post('/signup', async (req, res) => {
             },
         });
 
-        // Devuelve el usuario sin la contraseña
+        const token = jwt.sign(
+            { userId: newUser.id, email: newUser.email },
+            JWT_SECRET,
+            { expiresIn: '2h' }
+        );
+
         const { password: _, ...userWithoutPassword } = newUser;
-        res.status(201).json(userWithoutPassword);
+
+        res.status(201).json({ token, user: userWithoutPassword });
     } catch (error) {
         console.error('Error en /signup:', error);
         res.status(500).json({ error: 'Error interno del servidor' });
