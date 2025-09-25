@@ -11,9 +11,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'clave_super_secreta';
 //Ruta para verificar si un usuario está registrado
 router.post('/check-email', async (req, res) => {
     const { email } = req.body;
+    console.log("📩 Email recibido:", email);
 
     try {
         const user = await prisma.user.findUnique({ where: { email } });
+        console.log("👀 Resultado de búsqueda:", user);
 
         if (user) {
             return res.json({ exists: true });
